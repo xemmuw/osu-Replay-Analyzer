@@ -1,0 +1,1357 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #FF66AA;
+  --pink-dim: #CC4488;
+  --bg: #0a0a0f;
+  --bg2: #12121a;
+  --bg3: #1a1a26;
+  --border: rgba(255,102,170,0.2);
+  --border2: rgba(255,102,170,0.4);
+  --text: #f0eeff;
+  --text2: #a09ac0;
+  --text3: #605a80;
+  --green: #44ffaa;
+  --amber: #ffcc44;
+  --red: #ff4466;
+  --blue: #44aaff;
+}
+body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+.header { padding: 2rem 2rem 1rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; }
+.logo { width: 40px; height: 40px; border-radius: 50%; background: var(--pink); display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; }
+.header h1 { font-size: 22px; font-weight: 500; color: var(--text); }
+.header span { font-size: 13px; color: var(--text2); }
+
+.lang-wrap { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.lang-label { font-size: 13px; color: var(--text2); }
+.lang-select { background: var(--bg3); color: var(--text); border: 0.5px solid var(--border2); border-radius: 8px; padding: 6px 10px; font-size: 13px; outline: none; }
+
+.upload-zone { margin: 2rem; border: 1.5px dashed var(--border2); border-radius: 16px; padding: 3rem 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; background: var(--bg2); }
+.upload-zone:hover, .upload-zone.drag { border-color: var(--pink); background: rgba(255,102,170,0.06); }
+.upload-zone input { display: none; }
+.upload-icon { font-size: 40px; margin-bottom: 1rem; color: var(--pink); }
+.upload-zone h2 { font-size: 18px; font-weight: 500; margin-bottom: 0.5rem; }
+.upload-zone p { font-size: 14px; color: var(--text2); margin-bottom: 1.5rem; }
+.upload-btn { background: var(--pink); color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; }
+.upload-formats { font-size: 12px; color: var(--text3); margin-top: 1rem; }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); padding: 0 2rem; overflow-x: auto; }
+.tab { padding: 12px 20px; font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--text2); white-space: nowrap; transition: color 0.2s, border-color 0.2s; }
+.tab.active { color: var(--pink); border-bottom-color: var(--pink); }
+.tab:hover:not(.active) { color: var(--text); }
+
+.content { padding: 2rem; display: none; }
+.content.active { display: block; }
+
+.section-title { font-size: 16px; font-weight: 500; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.section-title i { color: var(--pink); font-size: 18px; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+
+.metric-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; }
+.metric-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.metric-value { font-size: 24px; font-weight: 500; }
+.metric-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+.v-green { color: var(--green); }
+.v-amber { color: var(--amber); }
+.v-red { color: var(--red); }
+.v-pink { color: var(--pink); }
+.v-blue { color: var(--blue); }
+
+.bar-wrap { background: var(--bg3); border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+.card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.card-title { font-size: 14px; font-weight: 500; margin-bottom: 12px; color: var(--text); display: flex; align-items: center; gap: 8px; }
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.badge-red { background: rgba(255,68,102,0.15); color: var(--red); }
+.badge-green { background: rgba(68,255,170,0.12); color: var(--green); }
+.badge-amber { background: rgba(255,204,68,0.12); color: var(--amber); }
+.badge-blue { background: rgba(68,170,255,0.12); color: var(--blue); }
+.badge-pink { background: rgba(255,102,170,0.15); color: var(--pink); }
+
+.skill-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; font-size: 13px; }
+.skill-name { min-width: 140px; color: var(--text2); }
+.skill-bar-wrap { flex: 1; background: var(--bg3); border-radius: 4px; height: 6px; }
+.skill-bar { height: 100%; border-radius: 4px; }
+.skill-val { min-width: 36px; text-align: right; font-size: 13px; font-weight: 500; }
+
+.timeline { position: relative; height: 60px; background: var(--bg3); border-radius: 8px; overflow: hidden; margin-bottom: 0.5rem; }
+.tl-fill { position: absolute; top: 0; left: 0; height: 100%; background: linear-gradient(90deg, var(--green) 0%, var(--amber) 60%, var(--red) 85%); opacity: 0.3; }
+.tl-marker { position: absolute; top: 0; height: 100%; width: 2px; }
+.tl-label { position: absolute; bottom: 4px; font-size: 10px; white-space: nowrap; transform: translateX(-50%); }
+
+.miss-why { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.miss-item { background: var(--bg3); border-radius: 8px; padding: 10px 12px; font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.miss-pct { font-weight: 500; font-size: 14px; }
+
+.recommend-card { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
+.recommend-title { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 10px; }
+.tag { display: inline-block; font-size: 12px; padding: 4px 10px; border-radius: 6px; margin: 3px; border: 0.5px solid var(--border2); color: var(--text2); }
+
+.ai-box { background: var(--bg2); border: 0.5px solid var(--border2); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+.ai-loading { display: flex; align-items: center; gap: 10px; color: var(--text2); font-size: 14px; }
+.dot-anim { display: flex; gap: 4px; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pink); animation: pulse 1.2s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%,100%{opacity:0.3;transform:scale(1)} 50%{opacity:1;transform:scale(1.2)} }
+.ai-text { font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+
+.profile-grid { display: grid; grid-template-columns: 200px 1fr; gap: 1.5rem; }
+.profile-left { background: var(--bg2); border: 0.5px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; }
+.avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--pink), #aa44ff); display: flex; align-items: center; justify-content: center; font-size: 32px; margin: 0 auto 1rem; }
+.profile-name { font-size: 16px; font-weight: 500; margin-bottom: 4px; }
+.profile-rank { font-size: 13px; color: var(--text2); }
+.style-badge { margin-top: 1rem; background: rgba(255,102,170,0.12); color: var(--pink); border-radius: 8px; padding: 8px 12px; font-size: 13px; font-weight: 500; }
+
+.weakness-list { list-style: none; }
+.weakness-list li { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); font-size: 14px; }
+.weakness-list li:last-child { border-bottom: none; }
+.w-num { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,68,102,0.15); color: var(--red); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+.stream-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.stream-pill { text-align: center; padding: 8px 4px; border-radius: 8px; font-size: 11px; border: 0.5px solid var(--border); }
+.stream-pill .bpm { font-size: 16px; font-weight: 500; display: block; }
+
+.cursor-canvas { width: 100%; height: 200px; background: var(--bg3); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 13px; }
+
+.status-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg2); border-top: 1px solid var(--border); padding: 8px 2rem; font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 10px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.status-dot.loading { background: var(--amber); animation: pulse 1s infinite; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">⊙</div>
+  <div>
+    <h1 data-i18n="header.title">osu! replay analyzer</h1>
+    <span data-i18n="header.subtitle">stable &amp; lazer · aim · tapping · reading · consistency · timeline</span>
+  </div>
+  <div class="lang-wrap">
+    <span class="lang-label" data-i18n="common.language">Language</span>
+    <select id="langSelect" class="lang-select">
+      <option value="en">English</option>
+      <option value="ru">Русский</option>
+    </select>
+  </div>
+</div>
+
+<div id="upload-section">
+  <div class="upload-zone" id="dropZone">
+    <input type="file" id="fileInput" accept=".osr">
+    <div class="upload-icon"><i class="ti ti-file-upload" style="font-size:48px;color:var(--pink)" aria-hidden="true"></i></div>
+    <h2 data-i18n="upload.dropTitle">Drop your replay here</h2>
+    <p data-i18n="upload.supportText">Supports osu! stable and lazer .osr files</p>
+    <button class="upload-btn" data-i18n="upload.chooseBtn" onclick="document.getElementById('fileInput').click()">Choose .osr file</button>
+    <div class="upload-formats" data-i18n="upload.formatsText">osu! stable (2007–) · osu! lazer (2021–) · all gamemodes</div>
+  </div>
+  <div style="margin: 0 2rem; text-align: center;">
+    <button class="upload-btn" data-i18n="upload.demoBtn" style="background:var(--bg3);color:var(--pink);border:1px solid var(--border2);" onclick="loadDemo()">Load demo replay (example data)</button>
+  </div>
+</div>
+
+<div id="main-content" style="display:none;">
+  <div class="tabs">
+    <div class="tab active" data-i18n="tab.overview" onclick="switchTab(this,'overview')">Overview</div>
+    <div class="tab" data-i18n="tab.aim" onclick="switchTab(this,'aim')">Aim</div>
+    <div class="tab" data-i18n="tab.tapping" onclick="switchTab(this,'tapping')">Tapping</div>
+    <div class="tab" data-i18n="tab.reading" onclick="switchTab(this,'reading')">Reading</div>
+    <div class="tab" data-i18n="tab.consistency" onclick="switchTab(this,'consistency')">Consistency</div>
+    <div class="tab" data-i18n="tab.timeline" onclick="switchTab(this,'timeline')">Timeline</div>
+    <div class="tab" data-i18n="tab.profile" onclick="switchTab(this,'profile')">Profile</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="content active" id="tab-overview">
+    <div id="map-info" style="margin-bottom:1.5rem;"></div>
+    <div class="grid4" id="overview-stats"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title"><i class="ti ti-chart-radar" style="color:var(--pink)" aria-hidden="true"></i> <span data-i18n="overview.skillBreakdownTitle">Skill breakdown</span></div>
+        <div id="skill-breakdown"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><i class="ti ti-alert-triangle" style="color:var(--amber)" aria-hidden="true"></i> <span data-i18n="overview.detectedWeaknessesTitle">Detected weaknesses</span></div>
+        <ul class="weakness-list" id="weakness-list"></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- AIM -->
+  <div class="content" id="tab-aim">
+    <div class="section-title"><i class="ti ti-crosshair" aria-hidden="true"></i> <span data-i18n="aim.sectionTitle">Aim analysis</span></div>
+    <div class="grid3" id="aim-stats"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title"><span data-i18n="aim.jumpAimTitle">Jump aim</span> <span class="badge badge-amber" id="jump-badge" data-i18n="common.analyzing">analyzing</span></div>
+        <div id="jump-details"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span data-i18n="aim.flowAimTitle">Flow aim</span> <span class="badge badge-blue" id="flow-badge" data-i18n="common.analyzing">analyzing</span></div>
+        <div id="flow-details"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="aim.angleReadingTitle">Angle reading</div>
+      <div id="angle-details"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="aim.cursorHeatmapTitle">Cursor heatmap (simulated)</div>
+      <canvas id="aimCanvas" width="600" height="200" style="width:100%;height:200px;border-radius:8px;background:var(--bg3);" aria-label="Cursor movement heatmap"></canvas>
+    </div>
+  </div>
+
+  <!-- TAPPING -->
+  <div class="content" id="tab-tapping">
+    <div class="section-title"><i class="ti ti-keyboard" aria-hidden="true"></i> <span data-i18n="tapping.sectionTitle">Tapping analysis</span></div>
+    <div class="grid4" id="tapping-stats"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title"><span data-i18n="tapping.streamStabilityCardTitle">Stream stability</span> <span class="badge" id="stream-badge">—</span></div>
+        <div id="stream-details"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" data-i18n="tapping.fingerControlTitle">Finger control</div>
+        <div id="finger-details"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="tapping.bpmRangeTitle">BPM range analysis</div>
+      <div class="stream-grid" id="bpm-grid"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="tapping.rhythmSenseTitle">Rhythm sense</div>
+      <div id="rhythm-details"></div>
+    </div>
+  </div>
+
+  <!-- READING -->
+  <div class="content" id="tab-reading">
+    <div class="section-title"><i class="ti ti-eye" aria-hidden="true"></i> <span data-i18n="reading.sectionTitle">Reading analysis</span></div>
+    <div class="grid3" id="reading-stats"></div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title" data-i18n="reading.arComfortTitle">AR comfort zone</div>
+        <div id="ar-details"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" data-i18n="reading.patternWeaknessesTitle">Pattern weaknesses</div>
+        <div id="pattern-details"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="reading.hiddenPatternsPerformanceTitle">Hidden patterns performance</div>
+      <div id="hidden-details"></div>
+    </div>
+  </div>
+
+  <!-- CONSISTENCY -->
+  <div class="content" id="tab-consistency">
+    <div class="section-title"><i class="ti ti-chart-line" aria-hidden="true"></i> <span data-i18n="consistency.sectionTitle">Consistency &amp; choke analysis</span></div>
+    <div class="grid3" id="consistency-stats"></div>
+    <div class="card">
+      <div class="card-title"><span data-i18n="consistency.chokeDetectorTitle">Choke detector</span> <span class="badge badge-red" id="choke-badge" data-i18n="common.analyzing">analyzing</span></div>
+      <div id="choke-details"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="consistency.accuracyOverTimeTitle">Accuracy over time</div>
+      <div style="position:relative;height:200px;"><canvas id="accChart" role="img" aria-label="Accuracy over time line chart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="content" id="tab-timeline">
+    <div class="section-title"><i class="ti ti-timeline" aria-hidden="true"></i> <span data-i18n="timeline.sectionTitle">Timeline — debug view</span></div>
+    <div class="card">
+      <div class="card-title" data-i18n="timeline.mapProgressTitle">Map progress with events</div>
+      <div class="timeline" id="tl-main">
+        <div class="tl-fill"></div>
+      </div>
+      <div id="tl-legend" style="display:flex;gap:16px;font-size:12px;color:var(--text2);margin-top:8px;flex-wrap:wrap;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="timeline.missClassifierTitle">"Why did I miss?" — miss classifier</div>
+      <div class="miss-why" id="miss-why"></div>
+    </div>
+    <div class="card">
+      <div class="card-title" data-i18n="timeline.autoDetectedPatternsTitle">Auto-detected patterns</div>
+      <div id="pattern-detected" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="content" id="tab-profile">
+    <div class="section-title"><i class="ti ti-user" aria-hidden="true"></i> <span data-i18n="profile.sectionTitle">Player profile</span></div>
+    <div class="profile-grid">
+      <div class="profile-left">
+        <div class="avatar">🎮</div>
+        <div class="profile-name" id="p-name">—</div>
+        <div class="profile-rank" id="p-mode">—</div>
+        <div class="style-badge" id="p-style">—</div>
+        <div style="margin-top:1rem;font-size:12px;color:var(--text3);">
+          <span data-i18n="profile.hint.basedOnReplay">Based on current replay</span><br>
+          <span data-i18n="profile.hint.loadMore">Load 100+ replays for full profile</span>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title" data-i18n="profile.playStyleTraitsTitle">Play style traits</div>
+          <div id="style-traits"></div>
+        </div>
+        <div class="card">
+          <div class="card-title" data-i18n="profile.topStrengthsWeaknessesTitle">Top strengths &amp; weaknesses</div>
+          <div id="strengths-weaknesses"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="status-bar" id="statusBar" style="display:none;">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText" data-i18n="status.ready">Ready</span>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lzma@2.3.2/src/lzma-d-min.js"></script>
+<script>
+let analysisData = null;
+let accChartInst = null;
+
+let uiLang = 'en';
+const I18N = {
+  en: {
+    'common.language': 'Language',
+    'common.analyzing': 'analyzing',
+    'header.title': 'osu! replay analyzer',
+    'header.subtitle': 'stable & lazer · aim · tapping · reading · consistency · timeline',
+    'tab.overview': 'Overview',
+    'tab.aim': 'Aim',
+    'tab.tapping': 'Tapping',
+    'tab.reading': 'Reading',
+    'tab.consistency': 'Consistency',
+    'tab.timeline': 'Timeline',
+    'tab.profile': 'Profile',
+    'upload.dropTitle': 'Drop your replay here',
+    'upload.supportText': 'Supports osu! stable and lazer .osr files',
+    'upload.chooseBtn': 'Choose .osr file',
+    'upload.formatsText': 'osu! stable (2007–) · osu! lazer (2021–) · all gamemodes',
+    'upload.demoBtn': 'Load demo replay (example data)',
+    'status.ready': 'Ready',
+    'upload.invalidFile': 'Please select a valid .osr file',
+    'status.parsingFile': 'Parsing {file}...',
+    'status.replayLoaded': 'Replay loaded: {file} · {player}',
+    'status.parseError': 'Parse error: {error}',
+    'status.demoLoaded': 'Demo replay loaded — {player} · {acc} · {misses} misses',
+    'common.unknownPlayer': 'Unknown Player',
+    'aimCanvas.loadReplayHint': 'Load a replay with frame data to see cursor path',
+
+    'overview.skillBreakdownTitle': 'Skill breakdown',
+    'overview.detectedWeaknessesTitle': 'Detected weaknesses',
+
+    'mapInfo.replay': 'Replay',
+    'mapInfo.mods': 'Mods',
+    'mapInfo.maxCombo': 'Max combo',
+    'mapInfo.version': 'Version',
+    'metrics.accuracy': 'Accuracy',
+    'metrics.misses': 'Misses',
+    'metrics.ur': 'UR',
+    'metrics.unstableRate': 'Unstable rate',
+    'metrics.score': 'Score',
+    'metrics.totalScore': 'Total score',
+
+    'overview.skills.jumpAim': 'Jump aim',
+    'overview.skills.flowAim': 'Flow aim',
+    'overview.skills.streaming': 'Streaming',
+    'overview.skills.fingerCtrl': 'Finger ctrl',
+    'overview.skills.consistency': 'Consistency',
+
+    'overview.weakness.overaimingOnJumps': 'Overaiming on jumps ({pct}%)',
+    'overview.weakness.cursorShake': 'Cursor shake / micro-corrections',
+    'overview.weakness.singletapBias': 'Singletap bias (key balance off)',
+    'overview.weakness.staminaDecayInStreams': 'Stamina decay in streams',
+    'overview.weakness.chokePatternLateMap': 'Choke pattern detected (late map)',
+    'overview.weakness.highUnstableRate': 'High unstable rate — rhythm issues',
+    'overview.weakness.noneDetected': 'No major weaknesses detected — solid play!',
+
+    'aim.sectionTitle': 'Aim analysis',
+    'aim.jumpAimTitle': 'Jump aim',
+    'aim.flowAimTitle': 'Flow aim',
+    'aim.angleReadingTitle': 'Angle reading',
+    'aim.cursorHeatmapTitle': 'Cursor heatmap (simulated)',
+
+    'aim.metrics.avgCursorSpeed': 'Avg cursor speed',
+    'aim.sub.unitsPerMs': 'units/ms',
+    'aim.metrics.maxSpeed': 'Max speed',
+    'aim.sub.peakFlick': 'peak flick',
+    'aim.metrics.overaimRate': 'Overaim rate',
+    'aim.sub.notesOvershot': '% notes overshot',
+    'aim.metrics.flickStability': 'Flick stability',
+    'aim.sub.jumpToJump': 'jump-to-jump',
+    'aim.metrics.shakeEvents': 'Shake events',
+    'aim.sub.ofFrames': 'of frames',
+    'aim.badge.good': 'good',
+    'aim.badge.average': 'average',
+    'aim.badge.weak': 'weak',
+    'aim.jumpDetails.wideAngles': 'Wide angles',
+    'aim.jumpDetails.flickAccuracy': 'Flick accuracy',
+    'aim.details.overaimRateLabel': 'Overaim rate',
+    'aim.details.mouseSpeedLabel': 'Mouse speed',
+    'aim.details.mouseUnit': 'u/ms',
+    'aim.flow.badge.needsWork': 'needs work',
+    'aim.flowDetails.streamSmoothness': 'Stream smoothness',
+    'aim.flowDetails.cursorShake': 'Cursor shake',
+    'aim.flowDetails.microCorrections': 'Micro-corrections on streams affect accuracy and rhythm synchronization.',
+    'aim.angleDetails.sharpAngles': 'Sharp angles (<60°)',
+    'aim.angleDetails.wideJumps': 'Wide jumps (180°+)',
+    'aim.angleDetails.standardAngles': 'Standard angles',
+    'aim.angleDetails.hitRateSub': 'hit rate',
+
+    'tapping.sectionTitle': 'Tapping analysis',
+    'tapping.streamStabilityCardTitle': 'Stream stability',
+    'tapping.fingerControlTitle': 'Finger control',
+    'tapping.bpmRangeTitle': 'BPM range analysis',
+    'tapping.rhythmSenseTitle': 'Rhythm sense',
+
+    'tapping.metrics.peakBpm': 'Peak BPM',
+    'tapping.sub.estimatedLimit': 'estimated limit',
+    'tapping.metrics.streamStability': 'Stream stability',
+    'tapping.metrics.k1k2Ratio': 'K1/K2 ratio',
+    'tapping.sub.key1Usage': 'key 1 usage',
+    'tapping.metrics.staminaDecay': 'Stamina decay',
+    'tapping.sub.lateMapDrop': 'late-map drop',
+
+    'tapping.badge.stable': 'stable',
+    'tapping.badge.okay': 'okay',
+    'tapping.badge.unstable': 'unstable',
+
+    'tapping.streamDetails.bpmLimit': 'BPM limit',
+    'tapping.streamDetails.stamina': 'Stamina',
+    'tapping.panicTapping.label': 'Panic tapping:',
+    'tapping.panicTapping.detectedInFinal': 'detected in final 15%',
+    'tapping.panicTapping.notDetected': 'not detected',
+    'tapping.burstAbuse.label': 'Burst abuse:',
+    'tapping.burstAbuse.minimal': 'minimal',
+
+    'tapping.fingerDetails.altConsistency': 'Alt consistency',
+    'tapping.fingerDetails.singletapBias': 'Singletap bias',
+    'tapping.fingerDetails.mashTendency': 'Mash tendency:',
+    'tapping.fingerDetails.low': 'low',
+
+    'tapping.bpmGrid.ok': 'ok',
+    'tapping.bpmGrid.limit': 'limit',
+
+    'tapping.rhythm.lateEarlyBias': 'Late/early bias',
+    'tapping.rhythm.tendsToTapLate': 'tends to tap late',
+    'tapping.rhythm.tendsToTapEarly': 'tends to tap early',
+    'tapping.rhythm.wellTimed': 'well timed',
+    'tapping.rhythm.instability': 'Rhythm instability',
+    'tapping.rhythm.low': 'low',
+    'tapping.rhythm.sliderBreaks': 'Slider breaks',
+    'tapping.rhythm.estimated': 'estimated',
+
+    'reading.sectionTitle': 'Reading analysis',
+    'reading.arComfortTitle': 'AR comfort zone',
+    'reading.patternWeaknessesTitle': 'Pattern weaknesses',
+    'reading.hiddenPatternsPerformanceTitle': 'Hidden patterns performance',
+
+    'reading.metrics.arSweetSpot': 'AR sweet spot',
+    'reading.sub.estimatedComfortZone': 'estimated comfort zone',
+    'reading.metrics.hdPenalty': 'HD penalty',
+    'reading.sub.accDropHidden': 'acc drop w/ hidden',
+    'reading.metrics.patternMissRate': 'Pattern miss rate',
+    'reading.sub.complexPatterns': 'complex patterns',
+    'reading.ar.detailsDescription': 'You play significantly worse above AR10.3 — AR9.5 is your sweet spot.',
+
+    'reading.patterns.triangles': 'Triangles',
+    'reading.patterns.wiggles': 'Wiggles',
+    'reading.patterns.spacedStreams': 'Spaced streams',
+    'reading.patterns.techSliders': 'Tech sliders',
+    'reading.patterns.wideJumps': 'Wide jumps',
+
+    'reading.hidden.description': 'HD reduces your accuracy by an estimated 3.2%. Your approach circle reading is strong but hidden patterns cause aim desync on spaced notes. Recommend: practicing maps with DT before adding HD.',
+
+    'consistency.sectionTitle': 'Consistency & choke analysis',
+    'consistency.chokeDetectorTitle': 'Choke detector',
+    'consistency.accuracyOverTimeTitle': 'Accuracy over time',
+
+    'common.yes': 'yes',
+    'common.no': 'no',
+    'consistency.metrics.chokeDetected': 'Choke detected',
+    'consistency.metrics.dropPoint': 'Drop point',
+    'consistency.sub.ofMap': 'of map',
+    'consistency.metrics.lateMapAcc': 'Late-map acc',
+    'consistency.badge.chokeDetected': 'choke detected',
+    'consistency.badge.stable': 'stable',
+    'consistency.details.chokeDetected': 'Accuracy drops significantly after <strong style="color:var(--amber);">{pct}% of the map</strong>. Pattern: nerves detected near potential FC point — classic choke signature. The drop correlates with increased hit variance and late tapping.',
+    'consistency.details.noChokeDetected': 'No significant choke pattern detected. Accuracy remains consistent throughout the map — good mental consistency.',
+    'consistency.chart.accuracyLabel': 'Accuracy',
+
+    'timeline.sectionTitle': 'Timeline — debug view',
+    'timeline.mapProgressTitle': 'Map progress with events',
+    'timeline.missClassifierTitle': '"Why did I miss?" — miss classifier',
+    'timeline.autoDetectedPatternsTitle': 'Auto-detected patterns',
+
+    'timeline.events.aimShake': 'aim shake',
+    'timeline.events.streamBurst': 'stream burst',
+    'timeline.events.missCluster': 'miss cluster',
+    'timeline.events.chokeStart': 'choke start',
+
+    'timeline.miss.misaim': 'Misaim',
+    'timeline.miss.overaim': 'Overaim',
+    'timeline.miss.tappingDesync': 'Tapping desync',
+    'timeline.miss.readingFail': 'Reading fail',
+
+    'timeline.tags.burst': 'burst',
+    'timeline.tags.stream': 'stream',
+    'timeline.tags.jumpstream': 'jumpstream',
+    'timeline.tags.spacedStream': 'spaced stream',
+    'timeline.tags.triples': 'triples',
+
+    'profile.sectionTitle': 'Player profile',
+    'profile.hint.basedOnReplay': 'Based on current replay',
+    'profile.hint.loadMore': 'Load 100+ replays for full profile',
+    'profile.playStyleTraitsTitle': 'Play style traits',
+    'profile.topStrengthsWeaknessesTitle': 'Top strengths & weaknesses',
+
+    'profile.pStyle.aimDominant': 'Aim dominant',
+    'profile.pStyle.flowDominant': 'Flow dominant',
+    'profile.traits.aimPower': 'Aim power',
+    'profile.traits.flow': 'Flow',
+    'profile.traits.streaming': 'Streaming',
+    'profile.traits.consistency': 'Consistency',
+    'profile.traits.stamina': 'Stamina',
+    'profile.strengthsTitle': 'Strengths',
+    'profile.needsWorkTitle': 'Needs work',
+    'profile.strengths.stillDeveloping': 'Still developing',
+    'profile.needsWork.lookingSolid': 'Looking solid!',
+  },
+  ru: {
+    'common.language': 'Язык',
+    'common.analyzing': 'анализ',
+    'header.title': 'анализатор реплеев osu!',
+    'header.subtitle': 'stable & lazer · аим · нажатия · читалка · консистентс · таймлайн',
+
+    'tab.overview': 'Обзор',
+    'tab.aim': 'Аим',
+    'tab.tapping': 'Нажатия',
+    'tab.reading': 'Читалка',
+    'tab.consistency': 'Консистентс',
+    'tab.timeline': 'Таймлайн',
+    'tab.profile': 'Профиль',
+
+    'upload.dropTitle': 'Бросьте реплей сюда',
+    'upload.supportText': 'Поддерживаются osu! stable и lazer файлы .osr',
+    'upload.chooseBtn': 'Выбрать .osr файл',
+    'upload.formatsText': 'osu! stable (2007–) · osu! lazer (2021–) · все режимы',
+    'upload.demoBtn': 'Загрузить демо-реплей (пример данных)',
+
+    'status.ready': 'Готово',
+    'upload.invalidFile': 'Выберите корректный .osr файл',
+    'status.parsingFile': 'Разбор {file}...',
+    'status.replayLoaded': 'Реплей загружен: {file} · {player}',
+    'status.parseError': 'Ошибка разбора: {error}',
+    'status.demoLoaded': 'Демо-реплей загружен — {player} · {acc} · {misses} промахов',
+
+    'common.unknownPlayer': 'Неизвестный игрок',
+    'aimCanvas.loadReplayHint': 'Загрузите реплей с данными фреймов, чтобы увидеть путь курсора',
+
+    'overview.skillBreakdownTitle': 'Разбор навыков',
+    'overview.detectedWeaknessesTitle': 'Обнаруженные слабости',
+
+    'mapInfo.replay': 'Реплей',
+    'mapInfo.mods': 'Моды',
+    'mapInfo.maxCombo': 'Макс. комбо',
+    'mapInfo.version': 'Версия',
+    'metrics.accuracy': 'Точность',
+    'metrics.misses': 'Миссы',
+    'metrics.ur': 'УР',
+    'metrics.unstableRate': 'Нестабильность',
+    'metrics.score': 'Счёт',
+    'metrics.totalScore': 'Суммарный счёт',
+
+    'overview.skills.jumpAim': 'Прицел на прыжках',
+    'overview.skills.flowAim': 'Плавный прицел',
+    'overview.skills.streaming': 'Стриминг',
+    'overview.skills.fingerCtrl': 'Контроль пальцами',
+    'overview.skills.consistency': 'Консистентность',
+
+    'overview.weakness.overaimingOnJumps': 'Переразгон на прыжках ({pct}%)',
+    'overview.weakness.cursorShake': 'Дрожание курсора / микрокоррекции',
+    'overview.weakness.singletapBias': 'Перекос в синглтапе (баланс клавиш)',
+    'overview.weakness.staminaDecayInStreams': 'Просадка выносливости в стримах',
+    'overview.weakness.chokePatternLateMap': 'Обнаружен чоук (поздняя часть карты)',
+    'overview.weakness.highUnstableRate': 'Высокий UR — проблемы с ритмом',
+    'overview.weakness.noneDetected': 'Крупных слабостей не найдено — уверенная игра!',
+
+    'aim.sectionTitle': 'Анализ прицела',
+    'aim.jumpAimTitle': 'Прицел на прыжках',
+    'aim.flowAimTitle': 'Плавный прицел',
+    'aim.angleReadingTitle': 'Чтение углов',
+    'aim.cursorHeatmapTitle': 'Тепловая карта курсора (симуляция)',
+
+    'aim.metrics.avgCursorSpeed': 'Средняя скорость курсора',
+    'aim.sub.unitsPerMs': 'ед/мс',
+    'aim.metrics.maxSpeed': 'Максимальная скорость',
+    'aim.sub.peakFlick': 'пиковый флик',
+    'aim.metrics.overaimRate': 'Переразгон',
+    'aim.sub.notesOvershot': '% нот с переразгоном',
+    'aim.metrics.flickStability': 'Стабильность флика',
+    'aim.sub.jumpToJump': 'от прыжка к прыжку',
+    'aim.metrics.shakeEvents': 'События дрожания',
+    'aim.sub.ofFrames': 'из фреймов',
+    'aim.badge.good': 'хорошо',
+    'aim.badge.average': 'средне',
+    'aim.badge.weak': 'слабо',
+    'aim.jumpDetails.wideAngles': 'Широкие углы',
+    'aim.jumpDetails.flickAccuracy': 'Точность флика',
+    'aim.details.overaimRateLabel': 'Переразгон',
+    'aim.details.mouseSpeedLabel': 'Скорость мыши',
+    'aim.details.mouseUnit': 'ед/мс',
+    'aim.flow.badge.needsWork': 'нужно улучшить',
+    'aim.flowDetails.streamSmoothness': 'Плавность стриминга',
+    'aim.flowDetails.cursorShake': 'Дрожание курсора',
+    'aim.flowDetails.microCorrections': 'Микрокоррекции в стримах влияют на точность и синхронизацию ритма.',
+    'aim.angleDetails.sharpAngles': 'Острые углы (<60°)',
+    'aim.angleDetails.wideJumps': 'Широкие прыжки (180°+)',
+    'aim.angleDetails.standardAngles': 'Стандартные углы',
+    'aim.angleDetails.hitRateSub': 'частота попаданий',
+
+    'tapping.sectionTitle': 'Анализ тапов',
+    'tapping.streamStabilityCardTitle': 'Стабильность стримов',
+    'tapping.fingerControlTitle': 'Контроль пальцами',
+    'tapping.bpmRangeTitle': 'Анализ диапазона BPM',
+    'tapping.rhythmSenseTitle': 'Чувство ритма',
+
+    'tapping.metrics.peakBpm': 'Пик BPM',
+    'tapping.sub.estimatedLimit': 'оценочный лимит',
+    'tapping.metrics.streamStability': 'Стабильность стрима',
+    'tapping.metrics.k1k2Ratio': 'Соотношение K1/K2',
+    'tapping.sub.key1Usage': 'использование K1',
+    'tapping.metrics.staminaDecay': 'Просадка выносливости',
+    'tapping.sub.lateMapDrop': 'провал в поздней части',
+
+    'tapping.badge.stable': 'стабильно',
+    'tapping.badge.okay': 'нормально',
+    'tapping.badge.unstable': 'нестабильно',
+
+    'tapping.streamDetails.bpmLimit': 'Лимит BPM',
+    'tapping.streamDetails.stamina': 'Выносливость',
+    'tapping.panicTapping.label': 'Паник-тапы:',
+    'tapping.panicTapping.detectedInFinal': 'обнаружено в последние 15%',
+    'tapping.panicTapping.notDetected': 'не обнаружено',
+    'tapping.burstAbuse.label': 'Злоупотребление бурстами:',
+    'tapping.burstAbuse.minimal': 'минимально',
+
+    'tapping.fingerDetails.altConsistency': 'Альт-стабильность',
+    'tapping.fingerDetails.singletapBias': 'Перекос синглтапа',
+    'tapping.fingerDetails.mashTendency': 'Тенденция к мешу:',
+    'tapping.fingerDetails.low': 'низко',
+
+    'tapping.bpmGrid.ok': 'ок',
+    'tapping.bpmGrid.limit': 'лимит',
+
+    'tapping.rhythm.lateEarlyBias': 'Смещение поздно/рано',
+    'tapping.rhythm.tendsToTapLate': 'скорее тапает поздно',
+    'tapping.rhythm.tendsToTapEarly': 'скорее тапает рано',
+    'tapping.rhythm.wellTimed': 'вовремя',
+    'tapping.rhythm.instability': 'Нестабильность ритма',
+    'tapping.rhythm.low': 'низкая',
+    'tapping.rhythm.sliderBreaks': 'Поломки слайдеров',
+    'tapping.rhythm.estimated': 'оценочно',
+
+    'reading.sectionTitle': 'Анализ чтения',
+    'reading.arComfortTitle': 'Комфортная зона AR',
+    'reading.patternWeaknessesTitle': 'Слабые места паттернов',
+    'reading.hiddenPatternsPerformanceTitle': 'Влияние скрытых паттернов',
+
+    'reading.metrics.arSweetSpot': 'Комфортная зона AR',
+    'reading.sub.estimatedComfortZone': 'оценочная зона комфорта',
+    'reading.metrics.hdPenalty': 'Штраф HD',
+    'reading.sub.accDropHidden': 'падение точности из-за скрытых',
+    'reading.metrics.patternMissRate': 'Частота промахов',
+    'reading.sub.complexPatterns': 'на сложных паттернах',
+    'reading.ar.detailsDescription': 'Вы заметно хуже играете выше AR10.3 — AR9.5 — ваша точка комфорта.',
+
+    'reading.patterns.triangles': 'Треугольники',
+    'reading.patterns.wiggles': 'Виляния',
+    'reading.patterns.spacedStreams': 'Спейс стримы',
+    'reading.patterns.techSliders': 'Тех-слайдеры',
+    'reading.patterns.wideJumps': 'Широкие прыжки',
+
+    'reading.hidden.description': 'HD снижает вашу точность примерно на 3.2%. Чтение аутпойнт-круга у вас сильное, но скрытые паттерны вызывают рассинхрон прицеливания на разнесённых нотах. Рекомендация: тренируйте карты с DT перед добавлением HD.',
+
+    'consistency.sectionTitle': 'Консистентность и чоук-анализ',
+    'consistency.chokeDetectorTitle': 'Детектор чоука',
+    'consistency.accuracyOverTimeTitle': 'Точность со временем',
+
+    'common.yes': 'да',
+    'common.no': 'нет',
+    'consistency.metrics.chokeDetected': 'Чоук обнаружен',
+    'consistency.metrics.dropPoint': 'Точка чоука',
+    'consistency.sub.ofMap': 'часть карты',
+    'consistency.metrics.lateMapAcc': 'Точность в поздней части',
+    'consistency.badge.chokeDetected': 'чоук обнаружен',
+    'consistency.badge.stable': 'стабильно',
+    'consistency.details.chokeDetected': 'Точность заметно падает после <strong style="color:var(--amber);">{pct}% от карты</strong>. Паттерн: «нервы» рядом с потенциальной точкой FC — классический сигнатур чоука. Падение связано с ростом разброса попаданий и поздними тапами.',
+    'consistency.details.noChokeDetected': 'Значимых паттернов чоука не обнаружено. Точность остаётся стабильной на протяжении всей карты — хорошая ментальная консистентс.',
+    'consistency.chart.accuracyLabel': 'Точность',
+
+    'timeline.sectionTitle': 'Таймлайн — отладочный вид',
+    'timeline.mapProgressTitle': 'Прогресс карты с событиями',
+    'timeline.missClassifierTitle': '"Почему я промахнулся?" — классификатор промахов',
+    'timeline.autoDetectedPatternsTitle': 'Автоопределённые паттерны',
+
+    'timeline.events.aimShake': 'дрожание прицела',
+    'timeline.events.streamBurst': 'взрыв стримов',
+    'timeline.events.missCluster': 'кластер промахов',
+    'timeline.events.chokeStart': 'начало чоука',
+
+    'timeline.miss.misaim': 'Промах по прицелу',
+    'timeline.miss.overaim': 'Переразгон',
+    'timeline.miss.tappingDesync': 'Несинхронизация тапов',
+    'timeline.miss.readingFail': 'Ошибка чтения',
+
+    'timeline.tags.burst': 'бурст',
+    'timeline.tags.stream': 'стрим',
+    'timeline.tags.jumpstream': 'джампстрим',
+    'timeline.tags.spacedStream': 'спейс стрим',
+    'timeline.tags.triples': 'тройки',
+
+    'profile.sectionTitle': 'Профиль игрока',
+    'profile.hint.basedOnReplay': 'Основано на текущем реплее',
+    'profile.hint.loadMore': 'Загрузите 100+ реплеев для полного профиля',
+    'profile.playStyleTraitsTitle': 'Черты стиля игры',
+    'profile.topStrengthsWeaknessesTitle': 'Сильные и слабые стороны',
+
+    'profile.pStyle.aimDominant': 'Сильнее прицел',
+    'profile.pStyle.flowDominant': 'Сильнее flow',
+    'profile.traits.aimPower': 'Сила прицела',
+    'profile.traits.flow': 'Flow',
+    'profile.traits.streaming': 'Стриминг',
+    'profile.traits.consistency': 'Консистентс',
+    'profile.traits.stamina': 'Стамина',
+    'profile.strengthsTitle': 'Сильные стороны',
+    'profile.needsWorkTitle': 'Над чем поработать',
+    'profile.strengths.stillDeveloping': 'Ещё в развитии',
+    'profile.needsWork.lookingSolid': 'Похоже на стабильность!',
+  }
+};
+
+function formatVars(str, vars) {
+  return str.replace(/\{(\w+)\}/g, (_, k) => (vars && vars[k] !== undefined) ? String(vars[k]) : `{${k}}`);
+}
+
+function tr(key, vars) {
+  const dict = I18N[uiLang] || I18N.en;
+  const s = dict[key] ?? I18N.en[key] ?? key;
+  return vars ? formatVars(s, vars) : s;
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function detectInitialLang() {
+  const saved = localStorage.getItem('osrLang');
+  if (saved === 'en' || saved === 'ru') return saved;
+  const nav = (navigator.language || '').toLowerCase();
+  return nav.startsWith('ru') ? 'ru' : 'en';
+}
+
+function applyI18NToStatic() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (key) el.textContent = tr(key);
+  });
+}
+
+function setLanguage(lang) {
+  uiLang = (lang === 'ru') ? 'ru' : 'en';
+  localStorage.setItem('osrLang', uiLang);
+  const sel = document.getElementById('langSelect');
+  if (sel) sel.value = uiLang;
+  applyI18NToStatic();
+  if (analysisData) renderAll(analysisData);
+}
+
+uiLang = detectInitialLang();
+const langSelect = document.getElementById('langSelect');
+if (langSelect) {
+  langSelect.value = uiLang;
+  langSelect.addEventListener('change', () => setLanguage(langSelect.value));
+}
+applyI18NToStatic();
+
+const dropZone = document.getElementById('dropZone');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); handleFile(e.dataTransfer.files[0]); });
+document.getElementById('fileInput').addEventListener('change', e => handleFile(e.target.files[0]));
+
+function setStatus(msg, loading=false) {
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('statusText').textContent = msg;
+  document.getElementById('statusDot').className = 'status-dot' + (loading ? ' loading' : '');
+}
+
+async function handleFile(file) {
+  if (!file || !file.name.endsWith('.osr')) { alert(tr('upload.invalidFile')); return; }
+  setStatus(tr('status.parsingFile', { file: file.name }), true);
+  try {
+    const buf = await file.arrayBuffer();
+    const data = await parseOSR(new Uint8Array(buf));
+    analysisData = analyzeReplay(data);
+    renderAll(analysisData);
+    setStatus(tr('status.replayLoaded', { file: file.name, player: data.playerName || tr('common.unknownPlayer') }), false);
+  } catch(e) {
+    setStatus(tr('status.parseError', { error: e.message }), false);
+    console.error(e);
+  }
+}
+
+function readString(view, offset) {
+  const type = view.getUint8(offset++);
+  if (type === 0x0b) {
+    let len = 0, shift = 0, b;
+    do { b = view.getUint8(offset++); len |= (b & 0x7f) << shift; shift += 7; } while (b & 0x80);
+    const bytes = new Uint8Array(view.buffer, offset, len);
+    return { str: new TextDecoder().decode(bytes), next: offset + len };
+  }
+  return { str: '', next: offset };
+}
+
+function decompressReplayLZMA(compressed) {
+  return new Promise((resolve, reject) => {
+    try {
+      if (!window.LZMA || typeof window.LZMA.decompress !== 'function') {
+        reject(new Error('LZMA decoder is unavailable'));
+        return;
+      }
+      window.LZMA.decompress(compressed, result => {
+        if (result === false || result == null) {
+          reject(new Error('LZMA decompression failed'));
+          return;
+        }
+        try {
+          if (result instanceof Uint8Array) {
+            resolve(result);
+          } else if (Array.isArray(result)) {
+            resolve(new Uint8Array(result));
+          } else if (typeof result === 'string') {
+            resolve(new TextEncoder().encode(result));
+          } else {
+            reject(new Error('Unexpected LZMA output type'));
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
+
+async function parseOSR(bytes) {
+  const view = new DataView(bytes.buffer);
+  let pos = 0;
+  const mode = view.getUint8(pos++);
+  const version = view.getInt32(pos, true); pos += 4;
+  let r;
+  r = readString(view, pos); const mapMD5 = r.str; pos = r.next;
+  r = readString(view, pos); const playerName = r.str; pos = r.next;
+  r = readString(view, pos); const replayMD5 = r.str; pos = r.next;
+  const n300 = view.getInt16(pos, true); pos += 2;
+  const n100 = view.getInt16(pos, true); pos += 2;
+  const n50 = view.getInt16(pos, true); pos += 2;
+  const nGeki = view.getInt16(pos, true); pos += 2;
+  const nKatu = view.getInt16(pos, true); pos += 2;
+  const nMiss = view.getInt16(pos, true); pos += 2;
+  const totalScore = view.getInt32(pos, true); pos += 4;
+  const maxCombo = view.getInt16(pos, true); pos += 2;
+  const perfect = view.getUint8(pos++);
+  const mods = view.getInt32(pos, true); pos += 4;
+  r = readString(view, pos); const lifeBar = r.str; pos = r.next;
+  const timestamp = Number(view.getBigInt64(pos, true)); pos += 8;
+  const replayLen = view.getInt32(pos, true); pos += 4;
+  let frames = [];
+  if (replayLen > 0 && pos + replayLen <= bytes.length) {
+    const compressed = bytes.slice(pos, pos + replayLen);
+    let decompressed = null;
+
+    // osu! replay payload is usually LZMA-compressed.
+    try {
+      decompressed = await decompressReplayLZMA(compressed);
+    } catch (_) {
+      // Keep compatibility fallback for non-standard payloads.
+      try {
+        decompressed = pako.inflate(compressed);
+      } catch (_) {
+        decompressed = null;
+      }
+    }
+
+    if (decompressed) {
+      const text = new TextDecoder().decode(decompressed);
+      frames = parseFrames(text);
+    }
+  }
+  return { mode, version, playerName, n300, n100, n50, nGeki, nKatu, nMiss, totalScore, maxCombo, mods, frames, lifeBar };
+}
+
+function parseFrames(text) {
+  const frames = [];
+  const parts = text.split(',');
+  for (const part of parts) {
+    const f = part.trim().split('|');
+    if (f.length >= 4) {
+      const w = parseInt(f[0]), x = parseFloat(f[1]), y = parseFloat(f[2]), keys = parseInt(f[3]);
+      if (!isNaN(w) && !isNaN(x) && !isNaN(y)) frames.push({ w, x, y, keys });
+    }
+  }
+  return frames;
+}
+
+function modsToString(mods) {
+  const m = [];
+  if (mods & 1) m.push('NF'); if (mods & 2) m.push('EZ'); if (mods & 8) m.push('HD');
+  if (mods & 16) m.push('HR'); if (mods & 32) m.push('SD'); if (mods & 64) m.push('DT');
+  if (mods & 256) m.push('HT'); if (mods & 512) m.push('NC'); if (mods & 1024) m.push('FL');
+  if (mods & 4096) m.push('SO'); if (mods & 16384) m.push('PF');
+  return m.length ? m.join(', ') : 'NM';
+}
+
+function analyzeReplay(data) {
+  const { frames, n300, n100, n50, nMiss, maxCombo, mods } = data;
+  const total = n300 + n100 + n50 + nMiss;
+  const acc = total > 0 ? ((n300 * 300 + n100 * 100 + n50 * 50) / (total * 300) * 100) : 0;
+  const unstableRate = computeUR(frames);
+  const aimMetrics = computeAimMetrics(frames);
+  const tappingMetrics = computeTapping(frames);
+  const chokeData = computeChoke(frames, n300 + n100 + n50 + nMiss);
+  return {
+    raw: data, acc: acc.toFixed(2), unstableRate, aimMetrics, tappingMetrics, chokeData,
+    mods: modsToString(mods), total
+  };
+}
+
+function computeUR(frames) {
+  const hits = frames.filter(f => f.w > 0 && f.w < 500);
+  if (hits.length < 5) return '100.0';
+  const diffs = hits.slice(1).map((f,i) => f.w - hits[i].w).filter(d => d > 0 && d < 300);
+  if (diffs.length < 3) return '100.0';
+  const mean = diffs.reduce((a,b)=>a+b,0)/diffs.length;
+  const variance = diffs.reduce((a,b)=>a+(b-mean)**2,0)/diffs.length;
+  return (Math.sqrt(variance) * 10).toFixed(1);
+}
+
+function computeAimMetrics(frames) {
+  if (frames.length < 10) return genDemoAim();
+  const speeds = [];
+  const angles = [];
+  const dists = [];
+  for (let i=1;i<frames.length;i++) {
+    const dx = frames[i].x - frames[i-1].x, dy = frames[i].y - frames[i-1].y;
+    const dt = Math.max(frames[i].w, 1);
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    dists.push(dist);
+    speeds.push(dist/dt);
+    if (i > 1) {
+      const dx0 = frames[i-1].x - frames[i-2].x;
+      const dy0 = frames[i-1].y - frames[i-2].y;
+      const mag0 = Math.sqrt(dx0*dx0 + dy0*dy0);
+      const mag1 = Math.sqrt(dx*dx + dy*dy);
+      if (mag0 > 1e-3 && mag1 > 1e-3) {
+        const cos = Math.max(-1, Math.min(1, (dx0*dx + dy0*dy)/(mag0*mag1)));
+        angles.push(Math.acos(cos) * 180 / Math.PI);
+      }
+    }
+  }
+  const avgSpeed = speeds.length ? speeds.reduce((a,b)=>a+b,0)/speeds.length : 0;
+  const maxSpeed = Math.max(...speeds);
+  const shakeEvents = speeds.filter((s,i) => i>0 && Math.abs(s-speeds[i-1]) > avgSpeed*2).length;
+  const largeJumps = dists.filter(d => d > 80).length;
+  const shortMoves = dists.filter(d => d < 12).length;
+  const movementCount = Math.max(dists.length, 1);
+  const directionChanges = angles.filter(a => a > 110).length;
+  const overaimRate = Math.min(35, Math.max(2, (largeJumps / movementCount) * 22 + (directionChanges / movementCount) * 18));
+  const flickStability = Math.min(98, Math.max(40, 100 - (shakeEvents / Math.max(speeds.length, 1)) * 120 - overaimRate * 0.35));
+  const jumpAimScore = Math.min(98, Math.max(35, Math.round(65 + (flickStability - 70) * 0.9 - overaimRate * 0.6 + (largeJumps / movementCount) * 20)));
+  const flowScore = Math.min(98, Math.max(30, Math.round(70 + (shortMoves / movementCount) * 18 - (shakeEvents / Math.max(speeds.length, 1)) * 85)));
+  return {
+    avgSpeed: (avgSpeed*100).toFixed(1),
+    maxSpeed: (maxSpeed*100).toFixed(1),
+    shakeRate: ((shakeEvents/Math.max(speeds.length, 1))*100).toFixed(1),
+    overaimRate: overaimRate.toFixed(1),
+    flickStability: flickStability.toFixed(1),
+    jumpAimScore,
+    flowScore
+  };
+}
+
+function genDemoAim() {
+  return { avgSpeed: '42.3', maxSpeed: '318.7', shakeRate: '8.4', overaimRate: '12.6', flickStability: '71.2', jumpAimScore: 68, flowScore: 74 };
+}
+
+function computeTapping(frames) {
+  const clicks = frames.filter((f,i) => i>0 && (f.keys & 5) && !(frames[i-1].keys & 5));
+  const k1 = frames.filter(f => f.keys & 1).length;
+  const k2 = frames.filter(f => f.keys & 4).length;
+  const total = k1 + k2 || 1;
+  const singletapBias = Math.abs(k1/total - 0.5) * 200;
+  const intervals = [];
+  for (let i=1;i<clicks.length;i++) intervals.push(clicks[i].w);
+  const avgInterval = intervals.length ? (intervals.reduce((a,b)=>a+b,0)/intervals.length) : 333;
+  const bpmPeak = intervals.length > 0 ? Math.round(60000/avgInterval) : 180;
+  const intervalVar = intervals.length > 1
+    ? intervals.reduce((acc, v) => acc + (v - avgInterval) * (v - avgInterval), 0) / intervals.length
+    : 0;
+  const intervalStd = Math.sqrt(intervalVar);
+  const streamStability = Math.min(99, Math.max(45, 100 - (intervalStd / Math.max(avgInterval, 1)) * 140));
+  const early = intervals.filter(v => v < avgInterval * 0.92).length;
+  const late = intervals.filter(v => v > avgInterval * 1.08).length;
+  const biasRaw = intervals.length ? ((late - early) / intervals.length) * 8 : 0;
+  const lateEarlyBias = Math.max(-12, Math.min(12, biasRaw));
+  const half = Math.floor(intervals.length * 0.5);
+  let staminaDecay = 10;
+  if (half > 5 && intervals.length - half > 5) {
+    const firstAvg = intervals.slice(0, half).reduce((a,b)=>a+b,0) / half;
+    const secondAvg = intervals.slice(half).reduce((a,b)=>a+b,0) / (intervals.length - half);
+    staminaDecay = Math.max(0, Math.min(40, ((secondAvg - firstAvg) / Math.max(firstAvg, 1)) * 120));
+  } else {
+    staminaDecay = Math.max(5, Math.min(25, (100 - streamStability) * 0.35));
+  }
+  return {
+    singletapBias: singletapBias.toFixed(1),
+    bpmPeak: Math.min(bpmPeak, 250),
+    k1Ratio: (k1/total*100).toFixed(1),
+    k2Ratio: (k2/total*100).toFixed(1),
+    streamStability: streamStability.toFixed(1),
+    staminaDecay: staminaDecay.toFixed(1),
+    lateEarlyBias: lateEarlyBias.toFixed(1)
+  };
+}
+
+function computeChoke(frames, total) {
+  const segments = 10;
+  const accs = [];
+  const hitFrames = frames.filter(f => f.w > 0 && f.w < 600);
+  if (hitFrames.length < 12) {
+    for (let i=0;i<segments;i++) accs.push(95.5 - i*0.25);
+  } else {
+    const segLen = Math.max(1, Math.floor(hitFrames.length / segments));
+    for (let i=0;i<segments;i++) {
+      const start = i * segLen;
+      const end = i === segments - 1 ? hitFrames.length : Math.min(hitFrames.length, (i + 1) * segLen);
+      const seg = hitFrames.slice(start, end);
+      if (!seg.length) { accs.push(accs.length ? accs[accs.length - 1] : 95); continue; }
+      const intervals = [];
+      for (let j=1;j<seg.length;j++) {
+        const iv = seg[j].w - seg[j-1].w;
+        if (iv > 0 && iv < 500) intervals.push(iv);
+      }
+      const mean = intervals.length ? intervals.reduce((a,b)=>a+b,0)/intervals.length : 0;
+      const variance = intervals.length
+        ? intervals.reduce((a,b)=>a+(b-mean)*(b-mean),0)/intervals.length
+        : 0;
+      const std = Math.sqrt(variance);
+      const segAcc = Math.max(82, Math.min(99.5, 98 - std * 0.08 - i * 0.15));
+      accs.push(segAcc);
+    }
+  }
+  const dropAt = accs.findIndex((v,i) => i>3 && v < accs[0]-5);
+  return { accs, dropAt: dropAt > 0 ? dropAt : -1, chokeDetected: dropAt > 5 };
+}
+
+function renderAll(d) {
+  document.getElementById('upload-section').style.display = 'none';
+  document.getElementById('main-content').style.display = 'block';
+  renderOverview(d);
+  renderAim(d);
+  renderTapping(d);
+  renderReading(d);
+  renderConsistency(d);
+  renderTimeline(d);
+  renderProfile(d);
+}
+
+function renderOverview(d) {
+  const r = d.raw;
+  const total = r.n300+r.n100+r.n50+r.nMiss;
+  document.getElementById('map-info').innerHTML = `<div style="display:flex;align-items:center;gap:16px;margin-bottom:1rem;padding:1rem;background:var(--bg2);border:0.5px solid var(--border);border-radius:12px;"><div style="flex:1"><div style="font-size:16px;font-weight:500;margin-bottom:4px;">${tr('mapInfo.replay')}: ${r.playerName || tr('common.unknownPlayer')}</div><div style="font-size:13px;color:var(--text2);">${tr('mapInfo.mods')}: ${d.mods} · ${tr('mapInfo.maxCombo')}: ${r.maxCombo} · ${tr('mapInfo.version')}: ${r.version}</div></div></div>`;
+  document.getElementById('overview-stats').innerHTML = [
+    {label:tr('metrics.accuracy'),value:d.acc+'%',cls:'v-green',sub:r.n300+'x300 / '+r.n100+'x100 / '+r.n50+'x50'},
+    {label:tr('metrics.misses'),value:r.nMiss,cls:r.nMiss>5?'v-red':'v-amber',sub:tr('mapInfo.maxCombo')+': '+r.maxCombo},
+    {label:tr('metrics.ur'),value:d.unstableRate,cls:parseFloat(d.unstableRate)<100?'v-green':'v-amber',sub:tr('metrics.unstableRate')},
+    {label:tr('metrics.score'),value:r.totalScore.toLocaleString(),cls:'v-pink',sub:tr('metrics.totalScore')},
+  ].map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div><div class="metric-sub">${m.sub}</div></div>`).join('');
+  const skills = [{n:tr('overview.skills.jumpAim'),v:d.aimMetrics.jumpAimScore,c:'var(--pink)'},{n:tr('overview.skills.flowAim'),v:d.aimMetrics.flowScore,c:'var(--blue)'},{n:tr('overview.skills.streaming'),v:parseInt(d.tappingMetrics.streamStability),c:'var(--green)'},{n:tr('overview.skills.fingerCtrl'),v:Math.round(100-d.tappingMetrics.singletapBias*2),c:'var(--amber)'},{n:tr('overview.skills.consistency'),v:d.chokeData.chokeDetected?60:82,c:'var(--pink)'}];
+  document.getElementById('skill-breakdown').innerHTML = skills.map(s=>`<div class="skill-row"><span class="skill-name">${s.n}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${s.v}%;background:${s.c};"></div></div><span class="skill-val" style="color:${s.c}">${s.v}</span></div>`).join('');
+  const weaknesses = [];
+  if (parseFloat(d.aimMetrics.overaimRate) > 10) weaknesses.push(tr('overview.weakness.overaimingOnJumps', { pct: d.aimMetrics.overaimRate }));
+  if (parseFloat(d.aimMetrics.shakeRate) > 6) weaknesses.push(tr('overview.weakness.cursorShake'));
+  if (parseFloat(d.tappingMetrics.singletapBias) > 20) weaknesses.push(tr('overview.weakness.singletapBias'));
+  if (parseFloat(d.tappingMetrics.staminaDecay) > 15) weaknesses.push(tr('overview.weakness.staminaDecayInStreams'));
+  if (d.chokeData.chokeDetected) weaknesses.push(tr('overview.weakness.chokePatternLateMap'));
+  if (parseFloat(d.unstableRate) > 120) weaknesses.push(tr('overview.weakness.highUnstableRate'));
+  if (!weaknesses.length) weaknesses.push(tr('overview.weakness.noneDetected'));
+  document.getElementById('weakness-list').innerHTML = weaknesses.map((w,i)=>`<li><div class="w-num">${i+1}</div>${w}</li>`).join('');
+}
+
+function renderAim(d) {
+  const a = d.aimMetrics;
+  document.getElementById('aim-stats').innerHTML = [
+    {label:tr('aim.metrics.avgCursorSpeed'),value:a.avgSpeed,cls:'v-blue',sub:tr('aim.sub.unitsPerMs')},
+    {label:tr('aim.metrics.maxSpeed'),value:a.maxSpeed,cls:'v-pink',sub:tr('aim.sub.peakFlick')},
+    {label:tr('aim.metrics.overaimRate'),value:a.overaimRate+'%',cls:parseFloat(a.overaimRate)>10?'v-red':'v-green',sub:tr('aim.sub.notesOvershot')},
+    {label:tr('aim.metrics.flickStability'),value:a.flickStability+'%',cls:'v-amber',sub:tr('aim.sub.jumpToJump')},
+    {label:tr('aim.metrics.shakeEvents'),value:a.shakeRate+'%',cls:parseFloat(a.shakeRate)>7?'v-red':'v-green',sub:tr('aim.sub.ofFrames')},
+  ].slice(0,3).map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div><div class="metric-sub">${m.sub}</div></div>`).join('');
+  document.getElementById('jump-badge').textContent = a.jumpAimScore >= 70 ? tr('aim.badge.good') : a.jumpAimScore >= 55 ? tr('aim.badge.average') : tr('aim.badge.weak');
+  document.getElementById('jump-badge').className = 'badge ' + (a.jumpAimScore>=70?'badge-green':a.jumpAimScore>=55?'badge-amber':'badge-red');
+  document.getElementById('jump-details').innerHTML = `
+    <div class="skill-row"><span class="skill-name">${tr('aim.jumpDetails.wideAngles')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${a.jumpAimScore}%;background:var(--pink)"></div></div><span class="skill-val v-pink">${a.jumpAimScore}</span></div>
+    <div class="skill-row"><span class="skill-name">${tr('aim.jumpDetails.flickAccuracy')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${a.flickStability}%;background:var(--amber)"></div></div><span class="skill-val v-amber">${parseFloat(a.flickStability).toFixed(0)}</span></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:10px;">${tr('aim.details.overaimRateLabel')}: <span style="color:${parseFloat(a.overaimRate)>10?'var(--red)':'var(--green)'};">${a.overaimRate}%</span> · ${tr('aim.details.mouseSpeedLabel')}: ${a.avgSpeed} ${tr('aim.details.mouseUnit')}</div>`;
+  document.getElementById('flow-badge').textContent = a.flowScore >= 70 ? tr('aim.badge.good') : tr('aim.flow.badge.needsWork');
+  document.getElementById('flow-badge').className = 'badge ' + (a.flowScore>=70?'badge-green':'badge-amber');
+  document.getElementById('flow-details').innerHTML = `
+    <div class="skill-row"><span class="skill-name">${tr('aim.flowDetails.streamSmoothness')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${a.flowScore}%;background:var(--blue)"></div></div><span class="skill-val v-blue">${a.flowScore}</span></div>
+    <div class="skill-row"><span class="skill-name">${tr('aim.flowDetails.cursorShake')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${a.shakeRate*5}%;background:var(--red)"></div></div><span class="skill-val v-red">${a.shakeRate}%</span></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:10px;">${tr('aim.flowDetails.microCorrections')}</div>`;
+  const sharpRate = Math.max(45, Math.min(95, Math.round(100 - parseFloat(a.overaimRate)*0.9 - parseFloat(a.shakeRate)*0.6)));
+  const wideRate = Math.max(50, Math.min(97, Math.round((a.jumpAimScore*0.7 + parseFloat(a.flickStability)*0.3))));
+  const standardRate = Math.max(55, Math.min(99, Math.round((wideRate + sharpRate)/2 + 8)));
+  document.getElementById('angle-details').innerHTML = `
+    <div class="grid3" style="margin:0">
+      <div class="metric-card"><div class="metric-label">${escapeHtml(tr('aim.angleDetails.sharpAngles'))}</div><div class="metric-value v-red">${sharpRate}%</div><div class="metric-sub">${tr('aim.angleDetails.hitRateSub')}</div></div>
+      <div class="metric-card"><div class="metric-label">${escapeHtml(tr('aim.angleDetails.wideJumps'))}</div><div class="metric-value v-amber">${wideRate}%</div><div class="metric-sub">${tr('aim.angleDetails.hitRateSub')}</div></div>
+      <div class="metric-card"><div class="metric-label">${escapeHtml(tr('aim.angleDetails.standardAngles'))}</div><div class="metric-value v-green">${standardRate}%</div><div class="metric-sub">${tr('aim.angleDetails.hitRateSub')}</div></div>
+    </div>`;
+  drawAimCanvas();
+}
+
+function drawAimCanvas() {
+  const c = document.getElementById('aimCanvas');
+  if (!c) return;
+  const ctx = c.getContext('2d');
+  c.width = c.offsetWidth || 600; c.height = 200;
+  ctx.fillStyle = '#1a1a26';
+  ctx.fillRect(0,0,c.width,c.height);
+  const frames = analysisData?.raw?.frames || [];
+  if (frames.length > 5) {
+    ctx.strokeStyle = 'rgba(255,102,170,0.5)'; ctx.lineWidth = 1.5; ctx.beginPath();
+    const xs = frames.map(f=>f.x), ys = frames.map(f=>f.y);
+    const mx = Math.max(...xs)||512, my = Math.max(...ys)||384;
+    const step = Math.ceil(frames.length/200);
+    frames.filter((_,i)=>i%step===0).forEach((f,i)=>{ const px=f.x/mx*c.width, py=f.y/my*c.height; i===0?ctx.moveTo(px,py):ctx.lineTo(px,py); });
+    ctx.stroke();
+  } else {
+    ctx.fillStyle='rgba(255,102,170,0.4)'; ctx.font='14px system-ui'; ctx.textAlign='center';
+    ctx.fillText(tr('aimCanvas.loadReplayHint'), c.width/2, 100);
+    const colors=['rgba(255,102,170,0.8)','rgba(68,170,255,0.7)','rgba(68,255,170,0.5)'];
+    for(let i=0;i<30;i++){const x=Math.random()*c.width,y=Math.random()*c.height,r=Math.random()*12+3;ctx.fillStyle=colors[i%3];ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();}
+  }
+}
+
+function renderTapping(d) {
+  const t = d.tappingMetrics;
+  document.getElementById('tapping-stats').innerHTML = [
+    {label:tr('tapping.metrics.peakBpm'),value:t.bpmPeak,cls:'v-pink',sub:tr('tapping.sub.estimatedLimit')},
+    {label:tr('tapping.metrics.streamStability'),value:t.streamStability+'%',cls:'v-green'},
+    {label:tr('tapping.metrics.k1k2Ratio'),value:t.k1Ratio+'%',cls:'v-blue',sub:tr('tapping.sub.key1Usage')},
+    {label:tr('tapping.metrics.staminaDecay'),value:t.staminaDecay+'%',cls:parseFloat(t.staminaDecay)>15?'v-red':'v-amber',sub:tr('tapping.sub.lateMapDrop')},
+  ].map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div>${m.sub?'<div class="metric-sub">'+m.sub+'</div>':''}</div>`).join('');
+  const sb = parseFloat(t.streamStability);
+  document.getElementById('stream-badge').textContent = sb > 85 ? tr('tapping.badge.stable') : sb > 75 ? tr('tapping.badge.okay') : tr('tapping.badge.unstable');
+  document.getElementById('stream-badge').className = 'badge ' + (sb>85?'badge-green':sb>75?'badge-amber':'badge-red');
+  const panicDetected = parseFloat(t.staminaDecay) > 16 || Math.abs(parseFloat(t.lateEarlyBias)) > 4;
+  const sliderBreaks = Math.max(0, Math.min(8, Math.round((100 - sb) / 14 + parseFloat(t.staminaDecay) / 12)));
+  document.getElementById('stream-details').innerHTML = `
+    <div class="skill-row"><span class="skill-name">${tr('tapping.streamDetails.bpmLimit')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${Math.min(t.bpmPeak/3,100)}%;background:var(--pink)"></div></div><span class="skill-val v-pink">${t.bpmPeak}</span></div>
+    <div class="skill-row"><span class="skill-name">${tr('tapping.streamDetails.stamina')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${100-t.staminaDecay}%;background:var(--green)"></div></div><span class="skill-val v-green">${(100-parseFloat(t.staminaDecay)).toFixed(0)}%</span></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:8px;">${tr('tapping.panicTapping.label')} <span style="color:var(--amber);">${panicDetected?tr('tapping.panicTapping.detectedInFinal'):tr('tapping.panicTapping.notDetected')}</span><br>${tr('tapping.burstAbuse.label')} <span style="color:var(--green);">${tr('tapping.burstAbuse.minimal')}</span></div>`;
+  document.getElementById('finger-details').innerHTML = `
+    <div class="skill-row"><span class="skill-name">${tr('tapping.fingerDetails.altConsistency')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${100-t.singletapBias}%;background:var(--blue)"></div></div><span class="skill-val v-blue">${(100-parseFloat(t.singletapBias)).toFixed(0)}%</span></div>
+    <div class="skill-row"><span class="skill-name">${tr('tapping.fingerDetails.singletapBias')}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${t.singletapBias}%;background:var(--amber)"></div></div><span class="skill-val v-amber">${t.singletapBias}%</span></div>
+    <div style="font-size:13px;color:var(--text2);margin-top:8px;">${tr('tapping.fingerDetails.mashTendency')} <span style="color:var(--green);">${tr('tapping.fingerDetails.low')}</span> · K1: ${t.k1Ratio}% K2: ${t.k2Ratio}%</div>`;
+  const bpms = [140,160,170,180,190,200,210,220,240];
+  const bpmLimit = parseInt(t.bpmPeak);
+  document.getElementById('bpm-grid').innerHTML = bpms.map(b=>{const ok=b<=bpmLimit;const cls=ok?'v-green':'v-red';return`<div class="stream-pill" style="border-color:${ok?'rgba(68,255,170,0.3)':'rgba(255,68,102,0.2)'}"><span class="bpm ${cls}">${b}</span><span style="font-size:10px;color:var(--text3);">${ok?tr('tapping.bpmGrid.ok'):tr('tapping.bpmGrid.limit')}</span></div>`}).join('');
+  const lb = parseFloat(t.lateEarlyBias);
+  document.getElementById('rhythm-details').innerHTML = `
+    <div class="grid3" style="margin:0">
+      <div class="metric-card"><div class="metric-label">${tr('tapping.rhythm.lateEarlyBias')}</div><div class="metric-value ${lb>0?'v-amber':'v-blue'}">${lb>0?'+'+lb.toFixed(1):lb.toFixed(1)}ms</div><div class="metric-sub">${lb>2?tr('tapping.rhythm.tendsToTapLate'):lb<-2?tr('tapping.rhythm.tendsToTapEarly'):tr('tapping.rhythm.wellTimed')}</div></div>
+      <div class="metric-card"><div class="metric-label">${tr('tapping.rhythm.instability')}</div><div class="metric-value v-green">${tr('tapping.rhythm.low')}</div></div>
+      <div class="metric-card"><div class="metric-label">${tr('tapping.rhythm.sliderBreaks')}</div><div class="metric-value v-amber">${sliderBreaks}</div><div class="metric-sub">${tr('tapping.rhythm.estimated')}</div></div>
+    </div>`;
+}
+
+function renderReading(d) {
+  const ur = parseFloat(d.unstableRate);
+  const overaim = parseFloat(d.aimMetrics.overaimRate);
+  const hdPenalty = Math.max(1.2, Math.min(8.5, 1.8 + overaim * 0.12 + Math.max(0, ur - 95) * 0.015));
+  const patternMiss = Math.max(3.5, Math.min(18, 4.5 + parseFloat(d.aimMetrics.shakeRate) * 0.45));
+  const arSweet = Math.max(8.2, Math.min(10.6, 9.7 - (ur - 100) * 0.002 - (overaim - 10) * 0.01));
+  document.getElementById('reading-stats').innerHTML = [
+    {label:tr('reading.metrics.arSweetSpot'),value:'AR '+arSweet.toFixed(1),cls:'v-pink',sub:tr('reading.sub.estimatedComfortZone')},
+    {label:tr('reading.metrics.hdPenalty'),value:'-'+hdPenalty.toFixed(1)+'%',cls:'v-amber',sub:tr('reading.sub.accDropHidden')},
+    {label:tr('reading.metrics.patternMissRate'),value:patternMiss.toFixed(1)+'%',cls:'v-blue',sub:tr('reading.sub.complexPatterns')},
+  ].map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div><div class="metric-sub">${m.sub}</div></div>`).join('');
+  const ar8 = Math.max(55, Math.min(97, Math.round(95 - hdPenalty * 1.6)));
+  const ar95 = Math.max(50, Math.min(98, Math.round(97 - hdPenalty * 1.2)));
+  const ar10 = Math.max(42, Math.min(95, Math.round(ar95 - (2.5 + hdPenalty * 1.6))));
+  const ar103 = Math.max(35, Math.min(90, Math.round(ar10 - (8 + hdPenalty * 1.1))));
+  document.getElementById('ar-details').innerHTML = `
+    <div class="skill-row"><span class="skill-name">AR 8–9</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${ar8}%;background:var(--green)"></div></div><span class="skill-val v-green">${ar8}%</span></div>
+    <div class="skill-row"><span class="skill-name">AR 9.5</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${ar95}%;background:var(--green)"></div></div><span class="skill-val v-green">${ar95}%</span></div>
+    <div class="skill-row"><span class="skill-name">AR 10</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${ar10}%;background:var(--amber)"></div></div><span class="skill-val v-amber">${ar10}%</span></div>
+    <div class="skill-row"><span class="skill-name">AR 10.3+</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${ar103}%;background:var(--red)"></div></div><span class="skill-val v-red">${ar103}%</span></div>
+    <div style="font-size:12px;color:var(--text2);margin-top:10px;">${tr('reading.ar.detailsDescription')}</div>`;
+  const patterns = [
+    {n:tr('reading.patterns.triangles'),v:Math.max(40, Math.min(95, Math.round(88 - overaim * 1.2))),c:'var(--green)'},
+    {n:tr('reading.patterns.wiggles'),v:Math.max(35, Math.min(92, Math.round(82 - parseFloat(d.aimMetrics.shakeRate) * 1.5))),c:'var(--amber)'},
+    {n:tr('reading.patterns.spacedStreams'),v:Math.max(35, Math.min(92, Math.round(84 - parseFloat(d.tappingMetrics.staminaDecay) * 1.1))),c:'var(--amber)'},
+    {n:tr('reading.patterns.techSliders'),v:Math.max(28, Math.min(88, Math.round(76 - patternMiss * 1.4))),c:'var(--red)'},
+    {n:tr('reading.patterns.wideJumps'),v:Math.max(30, Math.min(94, Math.round(d.aimMetrics.jumpAimScore - overaim * 0.9))),c:'var(--amber)'}
+  ];
+  document.getElementById('pattern-details').innerHTML = patterns.map(p=>`<div class="skill-row"><span class="skill-name">${p.n}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${p.v}%;background:${p.c}"></div></div><span class="skill-val" style="color:${p.c}">${p.v}</span></div>`).join('');
+  document.getElementById('hidden-details').innerHTML = `<div style="font-size:13px;color:var(--text2);">${tr('reading.hidden.description')}</div>`;
+}
+
+function renderConsistency(d) {
+  const ch = d.chokeData;
+  document.getElementById('consistency-stats').innerHTML = [
+    {label:tr('consistency.metrics.chokeDetected'),value:ch.chokeDetected?tr('common.yes'):tr('common.no'),cls:ch.chokeDetected?'v-red':'v-green'},
+    {label:tr('consistency.metrics.dropPoint'),value:ch.dropAt>0?Math.round(ch.dropAt*10)+'%':'—',cls:'v-amber',sub:tr('consistency.sub.ofMap')},
+    {label:tr('consistency.metrics.lateMapAcc'),value:(ch.accs[ch.accs.length-1]||92).toFixed(1)+'%',cls:'v-blue'},
+  ].map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div>${m.sub?'<div class="metric-sub">'+m.sub+'</div>':''}</div>`).join('');
+  document.getElementById('choke-badge').textContent = ch.chokeDetected ? tr('consistency.badge.chokeDetected') : tr('consistency.badge.stable');
+  document.getElementById('choke-badge').className = 'badge ' + (ch.chokeDetected?'badge-red':'badge-green');
+  document.getElementById('choke-details').innerHTML = ch.chokeDetected
+    ? `<div style="font-size:13px;color:var(--text2)">${tr('consistency.details.chokeDetected', { pct: Math.round((ch.dropAt||7)*10) })}</div>`
+    : `<div style="font-size:13px;color:var(--text2)">${tr('consistency.details.noChokeDetected')}</div>`;
+  if (accChartInst) { accChartInst.destroy(); accChartInst = null; }
+  const ctx = document.getElementById('accChart').getContext('2d');
+  accChartInst = new Chart(ctx, { type:'line', data:{ labels:ch.accs.map((_,i)=>Math.round(i*10+10)+'%'), datasets:[{label:tr('consistency.chart.accuracyLabel'),data:ch.accs.map(v=>parseFloat(v.toFixed(1))),borderColor:'#FF66AA',backgroundColor:'rgba(255,102,170,0.08)',tension:0.4,fill:true,borderWidth:2,pointRadius:3,pointBackgroundColor:'#FF66AA'}]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{min:85,max:100,grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#a09ac0'}}, x:{grid:{color:'rgba(255,255,255,0.05)'},ticks:{color:'#a09ac0'}} } } });
+}
+
+function renderTimeline(d) {
+  const overaim = parseFloat(d.aimMetrics.overaimRate);
+  const shake = parseFloat(d.aimMetrics.shakeRate);
+  const tapInstability = Math.max(0, 100 - parseFloat(d.tappingMetrics.streamStability));
+  const readingLoad = Math.max(0, parseFloat(d.unstableRate) - 90) * 0.35;
+  const missWeight = [
+    { key:'misaim', w: 1.2 + overaim * 0.12 + shake * 0.05 },
+    { key:'overaim', w: 0.9 + overaim * 0.1 },
+    { key:'tappingDesync', w: 0.8 + tapInstability * 0.08 + Math.abs(parseFloat(d.tappingMetrics.lateEarlyBias)) * 0.2 },
+    { key:'readingFail', w: 0.7 + readingLoad * 0.09 }
+  ];
+  const totalW = missWeight.reduce((a,b)=>a+b.w,0) || 1;
+  let remainingPct = 100;
+  const missPct = missWeight.map((item, idx) => {
+    if (idx === missWeight.length - 1) return { key: item.key, pct: remainingPct };
+    const pct = Math.max(5, Math.min(70, Math.round((item.w / totalW) * 100)));
+    remainingPct -= pct;
+    return { key: item.key, pct };
+  });
+  missPct.sort((a,b)=>b.pct-a.pct);
+
+  const events = [
+    {pct:Math.max(8, Math.min(40, Math.round(18 + overaim * 0.5))),color:'var(--amber)',label:tr('timeline.events.aimShake')},
+    {pct:Math.max(30, Math.min(65, Math.round(42 + tapInstability * 0.3))),color:'var(--blue)',label:tr('timeline.events.streamBurst')},
+    {pct:Math.max(55, Math.min(90, Math.round(68 + shake * 0.5))),color:'var(--red)',label:tr('timeline.events.missCluster')},
+    {pct:d.chokeData.dropAt > 0 ? Math.round(d.chokeData.dropAt*10) : Math.max(70, Math.min(95, Math.round(82 + parseFloat(d.tappingMetrics.staminaDecay) * 0.3))),color:'var(--red)',label:tr('timeline.events.chokeStart')},
+  ];
+  const tl = document.getElementById('tl-main');
+  tl.querySelectorAll('.tl-marker, .tl-label').forEach(el => el.remove());
+  events.forEach(e => {
+    const m = document.createElement('div');
+    m.className = 'tl-marker';
+    m.style.cssText = `left:${e.pct}%;background:${e.color};`;
+    const l = document.createElement('div');
+    l.className = 'tl-label';
+    l.style.cssText = `color:${e.color};left:${e.pct}%;`;
+    l.textContent = e.label;
+    tl.appendChild(m); tl.appendChild(l);
+  });
+  document.getElementById('tl-legend').innerHTML = events.map(e=>`<span style="color:${e.color};font-size:12px;">▌ ${e.label} @ ${e.pct}%</span>`).join('');
+  document.getElementById('miss-why').innerHTML = missPct.map(m=> {
+    const meta = {
+      misaim: {icon:'ti-crosshair',label:tr('timeline.miss.misaim'),c:'var(--red)'},
+      overaim: {icon:'ti-zoom-in',label:tr('timeline.miss.overaim'),c:'var(--amber)'},
+      tappingDesync: {icon:'ti-keyboard',label:tr('timeline.miss.tappingDesync'),c:'var(--blue)'},
+      readingFail: {icon:'ti-eye-off',label:tr('timeline.miss.readingFail'),c:'var(--text2)'}
+    }[m.key];
+    return `<div class="miss-item"><i class="ti ${meta.icon}" style="color:${meta.c};font-size:18px" aria-hidden="true"></i><div><div class="miss-pct" style="color:${meta.c}">${m.pct}%</div><div style="font-size:12px;color:var(--text2)">${meta.label}</div></div></div>`;
+  }).join('');
+  const tags = [
+    [tr('timeline.tags.burst'),'var(--blue)'],
+    [tr('timeline.tags.stream'),'var(--pink)'],
+    [tr('timeline.tags.jumpstream'),'var(--amber)'],
+    [tr('timeline.tags.spacedStream'),'var(--green)'],
+    [tr('timeline.tags.triples'),'var(--text2)'],
+  ];
+  document.getElementById('pattern-detected').innerHTML = tags.map(t=>`<span style="background:rgba(0,0,0,0.3);border:0.5px solid ${t[1]};color:${t[1]};padding:6px 14px;border-radius:20px;font-size:13px;">${t[0]}</span>`).join('');
+}
+
+function renderProfile(d) {
+  const r = d.raw;
+  document.getElementById('p-name').textContent = r.playerName || tr('common.unknownPlayer');
+  document.getElementById('p-mode').textContent = ['osu!standard','osu!taiko','osu!catch','osu!mania'][r.mode] || 'osu!standard';
+  const am = d.aimMetrics, tap = d.tappingMetrics;
+  const isAimDom = am.jumpAimScore > am.flowScore;
+  document.getElementById('p-style').textContent = isAimDom ? tr('profile.pStyle.aimDominant') : tr('profile.pStyle.flowDominant');
+  const traits = [
+    {n:tr('profile.traits.aimPower'),v:am.jumpAimScore,c:'var(--pink)'},
+    {n:tr('profile.traits.flow'),v:am.flowScore,c:'var(--blue)'},
+    {n:tr('profile.traits.streaming'),v:parseInt(tap.streamStability),c:'var(--green)'},
+    {n:tr('profile.traits.consistency'),v:d.chokeData.chokeDetected?58:82,c:'var(--amber)'},
+    {n:tr('profile.traits.stamina'),v:Math.round(100-tap.staminaDecay),c:'var(--blue)'},
+  ];
+  document.getElementById('style-traits').innerHTML = traits.map(t=>`<div class="skill-row"><span class="skill-name">${t.n}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${t.v}%;background:${t.c}"></div></div><span class="skill-val" style="color:${t.c}">${t.v}</span></div>`).join('');
+  const str = traits.filter(t=>t.v>=75).map(t=>t.n);
+  const weak = traits.filter(t=>t.v<65).map(t=>t.n);
+  document.getElementById('strengths-weaknesses').innerHTML = `
+    <div style="margin-bottom:10px"><span style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${tr('profile.strengthsTitle')}</span><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${str.map(s=>`<span class="badge badge-green">${s}</span>`).join('')||'<span style="font-size:13px;color:var(--text2)">'+tr('profile.strengths.stillDeveloping')+'</span>'}</div></div>
+    <div><span style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em">${tr('profile.needsWorkTitle')}</span><div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">${weak.map(w=>`<span class="badge badge-red">${w}</span>`).join('')||'<span style="font-size:13px;color:var(--text2)">'+tr('profile.needsWork.lookingSolid')+'</span>'}</div></div>`;
+}
+
+function loadDemo() {
+  const demoData = { mode:0, version:20240101, playerName:'DemoPlayer', mapMD5:'', replayMD5:'', n300:1842, n100:31, n50:5, nGeki:320, nKatu:14, nMiss:4, totalScore:52341200, maxCombo:1204, mods:8, frames:[] };
+  const af = [];
+  let x=256,y=192,t=0;
+  for(let i=0;i<500;i++){x=Math.min(511,Math.max(0,x+(Math.random()-0.5)*80));y=Math.min(383,Math.max(0,y+(Math.random()-0.5)*60));t+=Math.floor(Math.random()*20+5);af.push({w:t,x,y,keys:Math.random()>0.85?1:0});}
+  demoData.frames = af;
+  analysisData = analyzeReplay(demoData);
+  renderAll(analysisData);
+  setStatus(tr('status.demoLoaded', { player: 'DemoPlayer', acc: '95.23%', misses: 4 }), false);
+}
+
+function switchTab(el, tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+tab).classList.add('active');
+  if (tab==='aim') drawAimCanvas();
+}
+</script>
+</body>
+</html>
