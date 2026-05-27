@@ -919,11 +919,15 @@ async function parseOSR(bytes) {
 function parseFrames(text) {
   const frames = [];
   const parts = text.split(',');
+  let t = 0;
   for (const part of parts) {
     const f = part.trim().split('|');
     if (f.length >= 4) {
       const w = parseInt(f[0]), x = parseFloat(f[1]), y = parseFloat(f[2]), keys = parseInt(f[3]);
-      if (!isNaN(w) && !isNaN(x) && !isNaN(y)) frames.push({ w, x, y, keys });
+      if (!isNaN(w) && !isNaN(x) && !isNaN(y)) {
+        t += w;
+        frames.push({ w, t, x, y, keys });
+      }
     }
   }
   return frames;
@@ -953,12 +957,10 @@ function analyzeReplay(data) {
 }
 
 function computeUR(frames) {
-  const hits = frames.filter(f => f.w > 0 && f.w < 500);
-  if (hits.length < 5) return '100.0';
-  const diffs = hits.slice(1).map((f,i) => f.w - hits[i].w).filter(d => d > 0 && d < 300);
-  if (diffs.length < 3) return '100.0';
+  const diffs = frames.map(f => f.w).filter(d => d > 0 && d < 300);
+  if (diffs.length < 6) return '100.0';
   const mean = diffs.reduce((a,b)=>a+b,0)/diffs.length;
-  const variance = diffs.reduce((a,b)=>a+(b-mean)**2,0)/diffs.length;
+  const variance = diffs.reduce((a,b)=>a+(b-mean)*(b-mean),0)/diffs.length;
   return (Math.sqrt(variance) * 10).toFixed(1);
 }
 
@@ -1017,14 +1019,17 @@ function computeTapping(frames) {
   const total = k1 + k2 || 1;
   const singletapBias = Math.abs(k1/total - 0.5) * 200;
   const intervals = [];
-  for (let i=1;i<clicks.length;i++) intervals.push(clicks[i].w);
+  for (let i=1;i<clicks.length;i++) {
+    const iv = clicks[i].t - clicks[i-1].t;
+    if (iv > 0 && iv < 500) intervals.push(iv);
+  }
   const avgInterval = intervals.length ? (intervals.reduce((a,b)=>a+b,0)/intervals.length) : 333;
   const bpmPeak = intervals.length > 0 ? Math.round(60000/avgInterval) : 180;
   const intervalVar = intervals.length > 1
     ? intervals.reduce((acc, v) => acc + (v - avgInterval) * (v - avgInterval), 0) / intervals.length
     : 0;
   const intervalStd = Math.sqrt(intervalVar);
-  const streamStability = Math.min(99, Math.max(45, 100 - (intervalStd / Math.max(avgInterval, 1)) * 140));
+  const streamStability = Math.min(99, Math.max(20, 100 - (intervalStd / Math.max(avgInterval, 1)) * 150));
   const early = intervals.filter(v => v < avgInterval * 0.92).length;
   const late = intervals.filter(v => v > avgInterval * 1.08).length;
   const biasRaw = intervals.length ? ((late - early) / intervals.length) * 8 : 0;
@@ -1064,7 +1069,7 @@ function computeChoke(frames, total) {
       if (!seg.length) { accs.push(accs.length ? accs[accs.length - 1] : 95); continue; }
       const intervals = [];
       for (let j=1;j<seg.length;j++) {
-        const iv = seg[j].w - seg[j-1].w;
+        const iv = seg[j].t - seg[j-1].t;
         if (iv > 0 && iv < 500) intervals.push(iv);
       }
       const mean = intervals.length ? intervals.reduce((a,b)=>a+b,0)/intervals.length : 0;
@@ -1072,7 +1077,7 @@ function computeChoke(frames, total) {
         ? intervals.reduce((a,b)=>a+(b-mean)*(b-mean),0)/intervals.length
         : 0;
       const std = Math.sqrt(variance);
-      const segAcc = Math.max(82, Math.min(99.5, 98 - std * 0.08 - i * 0.15));
+      const segAcc = Math.max(82, Math.min(99.5, 98 - std * 0.11 - i * 0.22));
       accs.push(segAcc);
     }
   }
@@ -1102,7 +1107,19 @@ function renderOverview(d) {
     {label:tr('metrics.ur'),value:d.unstableRate,cls:parseFloat(d.unstableRate)<100?'v-green':'v-amber',sub:tr('metrics.unstableRate')},
     {label:tr('metrics.score'),value:r.totalScore.toLocaleString(),cls:'v-pink',sub:tr('metrics.totalScore')},
   ].map(m=>`<div class="metric-card"><div class="metric-label">${m.label}</div><div class="metric-value ${m.cls}">${m.value}</div><div class="metric-sub">${m.sub}</div></div>`).join('');
-  const skills = [{n:tr('overview.skills.jumpAim'),v:d.aimMetrics.jumpAimScore,c:'var(--pink)'},{n:tr('overview.skills.flowAim'),v:d.aimMetrics.flowScore,c:'var(--blue)'},{n:tr('overview.skills.streaming'),v:parseInt(d.tappingMetrics.streamStability),c:'var(--green)'},{n:tr('overview.skills.fingerCtrl'),v:Math.round(100-d.tappingMetrics.singletapBias*2),c:'var(--amber)'},{n:tr('overview.skills.consistency'),v:d.chokeData.chokeDetected?60:82,c:'var(--pink)'}];
+  const fingerCtrl = Math.max(5, Math.min(98, Math.round(
+    100
+    - parseFloat(d.tappingMetrics.singletapBias) * 0.9
+    - Math.abs(parseFloat(d.tappingMetrics.lateEarlyBias)) * 3.2
+    - parseFloat(d.tappingMetrics.staminaDecay) * 0.6
+  )));
+  const skills = [
+    {n:tr('overview.skills.jumpAim'),v:d.aimMetrics.jumpAimScore,c:'var(--pink)'},
+    {n:tr('overview.skills.flowAim'),v:d.aimMetrics.flowScore,c:'var(--blue)'},
+    {n:tr('overview.skills.streaming'),v:Math.round(parseFloat(d.tappingMetrics.streamStability)),c:'var(--green)'},
+    {n:tr('overview.skills.fingerCtrl'),v:fingerCtrl,c:'var(--amber)'},
+    {n:tr('overview.skills.consistency'),v:d.chokeData.chokeDetected?60:82,c:'var(--pink)'}
+  ];
   document.getElementById('skill-breakdown').innerHTML = skills.map(s=>`<div class="skill-row"><span class="skill-name">${s.n}</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:${s.v}%;background:${s.c};"></div></div><span class="skill-val" style="color:${s.c}">${s.v}</span></div>`).join('');
   const weaknesses = [];
   if (parseFloat(d.aimMetrics.overaimRate) > 10) weaknesses.push(tr('overview.weakness.overaimingOnJumps', { pct: d.aimMetrics.overaimRate }));
@@ -1209,7 +1226,12 @@ function renderReading(d) {
   const overaim = parseFloat(d.aimMetrics.overaimRate);
   const hdPenalty = Math.max(1.2, Math.min(8.5, 1.8 + overaim * 0.12 + Math.max(0, ur - 95) * 0.015));
   const patternMiss = Math.max(3.5, Math.min(18, 4.5 + parseFloat(d.aimMetrics.shakeRate) * 0.45));
-  const arSweet = Math.max(8.2, Math.min(10.6, 9.7 - (ur - 100) * 0.002 - (overaim - 10) * 0.01));
+  const arSweet = Math.max(8.0, Math.min(10.7,
+    9.6
+    - (ur - 100) * 0.006
+    - (overaim - 10) * 0.04
+    + (parseFloat(d.tappingMetrics.streamStability) - 75) * 0.004
+  ));
   document.getElementById('reading-stats').innerHTML = [
     {label:tr('reading.metrics.arSweetSpot'),value:'AR '+arSweet.toFixed(1),cls:'v-pink',sub:tr('reading.sub.estimatedComfortZone')},
     {label:tr('reading.metrics.hdPenalty'),value:'-'+hdPenalty.toFixed(1)+'%',cls:'v-amber',sub:tr('reading.sub.accDropHidden')},
